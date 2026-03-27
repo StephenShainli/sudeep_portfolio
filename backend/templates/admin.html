@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin — Contact Messages</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <style>
+      main {
+        max-width: 1000px;
+        margin: 90px auto 40px;
+        padding: 0 6vw;
+        position: relative;
+        z-index: 3;
+      }
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        overflow: hidden;
+      }
+      .table th,
+      .table td {
+        text-align: left;
+        padding: 14px 12px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-sec);
+        vertical-align: top;
+      }
+      .table th {
+        font-family: var(--font-heading);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        color: var(--text-pri);
+      }
+      .msg {
+        color: var(--text-pri);
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="nav-logo">SGV</div>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/admin">Admin</a></li>
+      </ul>
+      <div class="nav-right">
+        <button id="theme-toggle" aria-label="Toggle theme"></button>
+      </div>
+    </nav>
+
+    <main>
+      <div class="section-label water">Admin</div>
+      <h2 class="section-title water">Contact Messages</h2>
+
+      <div class="glass-card water-card" style="padding: 18px">
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
+          <button class="btn btn-water" id="refresh">Refresh</button>
+          <div id="meta" style="color:var(--text-sec);font-family:var(--font-heading);letter-spacing:1px;"></div>
+        </div>
+        <div style="overflow:auto">
+          <table class="table" id="table">
+            <thead>
+              <tr>
+                <th style="min-width: 90px">When</th>
+                <th style="min-width: 160px">Name</th>
+                <th style="min-width: 220px">Email</th>
+                <th style="min-width: 320px">Message</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const meta = document.getElementById("meta");
+      const tbody = document.getElementById("tbody");
+
+      async function load() {
+        meta.textContent = "Loading…";
+        tbody.innerHTML = "";
+        const res = await fetch("/api/contacts");
+        const data = await res.json();
+        if (!data.success) {
+          meta.textContent = "Failed to load.";
+          return;
+        }
+        meta.textContent = `${data.total} messages`;
+        for (const c of data.contacts) {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${new Date(c.created_at).toLocaleString()}</td>
+            <td>${escapeHtml(c.name)}</td>
+            <td>${escapeHtml(c.email)}</td>
+            <td class="msg">${escapeHtml(c.message)}</td>
+          `;
+          tbody.appendChild(tr);
+        }
+      }
+
+      function escapeHtml(s) {
+        return String(s)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      document.getElementById("refresh").addEventListener("click", load);
+      document.getElementById("theme-toggle").addEventListener("click", () => {
+        const h = document.documentElement;
+        h.setAttribute("data-theme", h.getAttribute("data-theme") === "dark" ? "light" : "dark");
+      });
+
+      load();
+    </script>
+  </body>
+</html>
+

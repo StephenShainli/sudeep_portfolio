@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: sudeeep-portfolio
+    env: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn server:app
+    disk:
+      name: portfolio-db
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: RENDER_DISK_PATH
+        value: /var/data
+
