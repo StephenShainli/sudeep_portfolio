@@ -5,11 +5,7 @@ services:
     rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn server:app
-    disk:
-      name: portfolio-db
-      mountPath: /var/data
-      sizeGB: 1
     envVars:
-      - key: RENDER_DISK_PATH
-        value: /var/data
+      - key: DATABASE_URL
+        sync: false
 

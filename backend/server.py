@@ -12,7 +12,7 @@ import os
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 
-from database import (
+from .database import (
     add_contact,
     get_all_contacts,
     get_visitor_count,
